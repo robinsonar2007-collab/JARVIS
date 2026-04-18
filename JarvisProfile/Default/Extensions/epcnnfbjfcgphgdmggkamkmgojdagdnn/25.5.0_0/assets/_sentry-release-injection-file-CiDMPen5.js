@@ -1,0 +1,2 @@
+(function(){try{var e=typeof window<"u"?window:typeof global<"u"?global:typeof self<"u"?self:{},d=new e.Error().stack;d&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[d]="a9e51c88-9482-4568-a46c-a19950e292af",e._sentryDebugIdIdentifier="sentry-dbid-a9e51c88-9482-4568-a46c-a19950e292af")}catch{}})();var n=typeof window<"u"?window:typeof global<"u"?global:typeof self<"u"?self:{};n.SENTRY_RELEASE={id:"4c782e825dcb95e5110486d00282edc3aa526d17"};
+//# sourceMappingURL=_sentry-release-injection-file-CiDMPen5.js.map

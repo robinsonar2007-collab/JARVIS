@@ -2,98 +2,197 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Jarvis Widget</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS Mark VII HUD</title>
     <style>
-        body { background: #000; color: #00d4ff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        
-        .circle { 
-            position: relative; border: 4px solid #00d4ff; border-radius: 50%; 
-            width: 220px; height: 220px; box-shadow: 0 0 30px #00d4ff; 
-            display: flex; justify-content: center; align-items: center; 
-            font-weight: bold; transition: all 0.2s; text-align: center; 
-            font-size: 24px; letter-spacing: 2px;
+        body {
+            background-color: #000;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 50, 80, 0.4) 0%, rgba(0, 0, 0, 1) 70%),
+                linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            color: #00d4ff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            border: 10px solid rgba(0, 212, 255, 0.2);
+            box-shadow: inset 0 0 100px rgba(0, 212, 255, 0.3);
+            perspective: 1000px;
         }
 
-        /* --- VIBRATION EFFECT --- */
-        .vibrate {
-            animation: pulse 0.6s infinite;
-            border-color: #00fbff;
-            box-shadow: 0 0 60px #00fbff, inset 0 0 25px #00fbff;
-            text-shadow: 0 0 10px #00fbff;
+        /* Top HUD Displays */
+        .hud-overlay {
+            position: absolute;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            pointer-events: none;
+            text-shadow: 0 0 5px #00d4ff;
         }
 
+        .top-left { top: 30px; left: 40px; }
+        .top-right { top: 30px; right: 40px; text-align: right; }
+        .bottom-right { bottom: 30px; right: 40px; text-align: right; }
+
+        .data-stream {
+            font-size: 10px;
+            color: rgba(0, 212, 255, 0.6);
+            margin-top: 5px;
+            animation: dataScroll 10s linear infinite;
+        }
+
+        @keyframes dataScroll {
+            0% { opacity: 0; transform: translateY(10px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* --- STARK CORE VISUALIZER --- */
+        .core-container {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .ring.outer {
+            width: 100%; height: 100%;
+            border-style: dashed;
+            animation: spinCounter 15s linear infinite;
+        }
+
+        .ring.middle {
+            width: 80%; height: 80%;
+            border-width: 4px;
+            border-color: rgba(0, 212, 255, 0.8);
+            animation: spin 10s linear infinite;
+        }
+
+        .ring.inner {
+            width: 60%; height: 60%;
+            border-style: dotted;
+            animation: spinCounter 5s linear infinite;
+        }
+
+        #visualizer {
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(0,212,255,0.6) 0%, rgba(0,212,255,0) 70%);
+            border: 5px solid #00d4ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 50px #00d4ff, inset 0 0 30px #00d4ff;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spinCounter { 100% { transform: rotate(-360deg); } }
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.08); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px #00d4ff; }
+            50% { transform: scale(1.1); box-shadow: 0 0 70px #00d4ff; }
+        }
+
+        #statusText {
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 15px #fff;
+        }
+
+        .scan-line {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            box-shadow: 0 0 10px #00d4ff;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="circle" id="circle">JARVIS</div>
+
+    <div class="hud-overlay top-left">
+        SYSTEM: ONLINE<br>
+        CORE: NEURAL-LINK 1.0<br>
+        MODE: STANDBY
+        <div class="data-stream">> AUTH_KEY: MK7-ACTIVE<br>> SEC_LEVEL: ALPHA</div>
+    </div>
+
+    <div class="hud-overlay top-right">
+        <span id="timeDisplay">TIME: --:--:--</span><br>
+        <span id="batteryDisplay">BATT: --%</span>
+        <div class="data-stream">> PING: 15ms<br>> UPTIME: ACTIVE</div>
+    </div>
+
+    <div class="core-container">
+        <div class="ring outer"></div>
+        <div class="ring middle"></div>
+        <div class="ring inner"></div>
+        <div id="visualizer">
+            <div id="statusText">LISTENING</div>
+        </div>
+    </div>
+
+    <div class="scan-line"></div>
 
     <script>
-        const circle = document.getElementById('circle');
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'en-US';
-        recognition.continuous = false;
+        const statusText = document.getElementById('statusText');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const batteryDisplay = document.getElementById('batteryDisplay');
 
-        async function startJarvis() {
-            try { 
-                recognition.start(); 
-                circle.innerText = "JARVIS"; 
-            } catch (e) {}
+        function updateHUD() {
+            const now = new Date();
+            timeDisplay.innerText = "TIME: " + now.toLocaleTimeString();
+            
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(bat => {
+                    batteryDisplay.innerText = "BATT: " + Math.round(bat.level * 100) + "%";
+                });
+            }
         }
 
-        recognition.onresult = async (event) => {
-            // Server kitta Jarvis pesuraara-nu check pannuvom
-            const response = await fetch(`http://localhost:3000/status`);
-            const status = await response.json();
+        setInterval(updateHUD, 1000);
+        updateHUD();
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            utterance.voice = voices.find(v => v.name.includes('Google UK English Male')) || voices[0];
             
-            if (status.speaking) {
-                circle.classList.add('vibrate'); // Pesumbodhu vibrate aaganum
-                return;
-            } else {
-                circle.classList.remove('vibrate');
-            }
-
-            const command = event.results[0][0].transcript.toLowerCase().trim();
-            console.log("Heard: " + command);
-
-            if (command === "jarvis" || command === "hey jarvis") {
-                fetch(`http://localhost:3000/wake`);
-                circle.innerText = "YES SIR"; 
-                circle.classList.add('vibrate'); 
-                setTimeout(() => { 
-                    circle.innerText = "JARVIS"; 
-                    circle.classList.remove('vibrate');
-                }, 3000);
-                return;
-            }
-
-            // Command process aagumbodhum chinna vibration
-            circle.classList.add('vibrate');
-            fetch(`http://localhost:3000/command?q=${encodeURIComponent(command)}`);
-            setTimeout(() => { circle.classList.remove('vibrate'); }, 4000);
-        };
-
-        // Automatic state check to keep vibration alive while Jarvis speaks
-        setInterval(async () => {
-            const response = await fetch(`http://localhost:3000/status`);
-            const status = await response.json();
-            if (status.speaking) {
-                circle.classList.add('vibrate');
-                if(circle.innerText === "JARVIS") circle.innerText = "SPEAKING";
-            } else {
-                if(circle.innerText === "SPEAKING") circle.innerText = "JARVIS";
-                circle.classList.remove('vibrate');
-            }
-        }, 500);
-
-        recognition.onend = () => { startJarvis(); };
-        recognition.onerror = () => { setTimeout(startJarvis, 1000); };
-        
-        startJarvis();
+            utterance.onstart = () => { 
+                statusText.innerText = "SPEAKING";
+                document.getElementById('visualizer').style.borderColor = "#fff";
+            };
+            utterance.onend = () => { 
+                statusText.innerText = "LISTENING";
+                document.getElementById('visualizer').style.borderColor = "#00d4ff";
+            };
+            window.speechSynthesis.speak(utterance);
+        }
     </script>
 </body>
 </html>
